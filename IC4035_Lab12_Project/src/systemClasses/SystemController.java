@@ -5,6 +5,7 @@ import generalClasses.P3Utils;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
@@ -151,6 +152,10 @@ public class SystemController {
 	private void registerDataInMIM(int docID, Map<String, ArrayList<Integer>> documentWordsMap) {
 		//ADD MISSING CODE HERE	(Exercise 4)
 		
+		for(Map.Entry<String, ArrayList<Integer>> e: documentWordsMap.entrySet())
+				mim.registerWordInDocument(e.getKey(), docID, e.getValue().size());
+		
+		
 		
 		
 	}
@@ -203,8 +208,18 @@ public class SystemController {
 			ArrayList<Integer> wordLocsList = documentWordsMap.get(wid.getWord());	
 			// ADD MISSING CODE HERE (Exercise 4)
 			
-			
-			
+			if(wordLocsList == null){ //current wordindocument is not in the map yet. 
+				
+				wordLocsList = new ArrayList<>();
+				wordLocsList.add((int) wid.getLocation());
+				
+				documentWordsMap.put(wid.getWord(),wordLocsList);
+			}else{
+				//current wordindocument was found. add a new location to the list of locations
+				wordLocsList.add((int)wid.getLocation());
+				//edit the map
+				documentWordsMap.put(wid.getWord(),wordLocsList);
+			}			
 		}
 	}
 

@@ -83,11 +83,13 @@ public class DocsIDManager {
 			else if (docNamesList.get(i).equals(name))
 				return -1;      // the document exists
 		}
-		if (newID == -1) {
+		if (newID == -1) { //in case size of list was 0 (because docs_ID.pp3 was empty)
 			docNamesList.add(name); 
 			newID = docNamesList.size();   // zero can't be a doc id
 		}
-		else 
+		else //there is an empty space in the index (due to a removal)
+			//recall that newID was set to i+1. So, the set is actually at i which is were
+			//an available slot was first found.
 			docNamesList.set(newID-1, name); 
 		
 		modified = true; 
@@ -99,7 +101,7 @@ public class DocsIDManager {
 	public void removeDocID(int docID) 
 	throws IllegalArgumentException {
 		try { 
-			docNamesList.set(docID-1, "");
+			docNamesList.set(docID-1, ""); //make the name empty to mark it as an available slot
 		} catch (IndexOutOfBoundsException e) {
 			throw new IllegalArgumentException("Invalid docID: " + docID); 
 		}
