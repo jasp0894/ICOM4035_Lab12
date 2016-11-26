@@ -11,6 +11,7 @@ public class DocsIDManagerTester1 {
 	private static DocsIDManager docIDs; 
 
 	public static void main(String[] args) throws IOException {	
+		System.out.println("blaaaaaaaaaaaaaaa");
 		docIDs = DocsIDManager.getInstance(); 
 		docIDs.addDocument("perro"); 
 		docIDs.addDocument("pepe"); 
