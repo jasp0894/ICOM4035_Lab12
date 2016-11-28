@@ -142,6 +142,43 @@ public class SystemController {
 		return "Document " + docName + " was successfully added."; // things worked fine			
 	}
 	
+	public String removeDocumentFromIndex(String docName) throws IOException{
+		String s = "";
+		
+		File docFilePath;
+		//The idea is to verify that the given docName is valid in terms of java rules for names and
+		//that is indeed an existent document.
+		
+		try { 
+			docFilePath = P3Utils.validateDocumentFile(docName); //validates docName in terms of the criteria
+			//mentioned above
+		} catch (IllegalArgumentException e) { 
+			return e.getMessage(); 
+		}
+		
+		//At this point, we know that the documents exists and its name is valid. 
+		//Now the task is to modify main index and docID index. 
+		//First, let's create a new Document Object.
+		RandomAccessFile docFile = new RandomAccessFile(docFilePath, "r"); 
+		
+		int docID = didm.getDocumentID(docName);
+		System.out.println("document ID: "+docID);
+		Document docToRemove = new Document(docID);
+		
+		for(WordInDocument w: docToRemove){
+			//search inside the index (by the key = the name of the word)
+			//for each pair of (docID, freq) look for those whose docID equals and erase them
+			mim.removeDocID(w.getWord(), docID);
+		
+		}
+		
+		//remove document name from docID_index
+		
+		didm.removeDocID(docID);
+		
+		s = "Document" + docName + "with ID="+ docID+ " has been deleted";
+		return s;
+	}
 	/**
 	 * Registers all data of the new document in mim structure. For each word in the document, 
 	 * there will be a pair (docID, frequency) that will be added. 
@@ -153,11 +190,7 @@ public class SystemController {
 		//ADD MISSING CODE HERE	(Exercise 4)
 		
 		for(Map.Entry<String, ArrayList<Integer>> e: documentWordsMap.entrySet())
-				mim.registerWordInDocument(e.getKey(), docID, e.getValue().size());
-		
-		
-		
-		
+				mim.registerWordInDocument(e.getKey(), docID, e.getValue().size());	
 	}
 
 	/**

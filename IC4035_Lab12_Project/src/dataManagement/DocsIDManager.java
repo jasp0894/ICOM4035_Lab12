@@ -174,4 +174,22 @@ public class DocsIDManager {
 		}
 	}
 	
+	/**
+	 * Gets the ID of the given document
+	 * @param DocName name of the document
+	 * @return the ID of document in the system index.
+	 */
+	public int getDocumentID(String DocName){
+		//PRE:DocName is Valid and exists in indedx
+		int i=1;
+		for(String name: docNamesList){
+			if(name.equals(DocName))
+				return i;
+			i++;
+		}
+		
+		return -1;
+		
+	}
+	
 }

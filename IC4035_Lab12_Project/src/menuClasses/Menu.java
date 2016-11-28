@@ -25,7 +25,6 @@ public abstract class Menu {
 		}
 		menuString += "\nEnter your selection: "; 
 	}
-
 	/**
 	 * Activates the menu: displays the different options, request a selection from 
 	 * user, validate, and return the option corresponding to the user's selection.

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.Map.Entry;
 
 public class P3Utils {
 	public static final int MAXFILENAMELENGTH = 20; 
@@ -58,10 +59,17 @@ public class P3Utils {
 		return fPath; 
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static <E> int findIndex(ArrayList<E> list, E e) { 
-		for (int i=0; i<list.size(); i++)
-			if (list.get(i).equals(e))
+		ArrayList<Entry<Integer,Integer>> l = (ArrayList<Entry<Integer,Integer>>) list;
+		Entry<Integer,Integer> e2 = (Entry<Integer,Integer>) e;
+		Integer docID = e2.getKey();
+		System.out.println(docID);
+		for(int i=0; i<l.size(); i++){
+			
+			if (l.get(i).getKey().equals(docID))
 				return i; 
+		}
 		
 		return -1; 
 	}
