@@ -177,7 +177,7 @@ public class DocsIDManager {
 	/**
 	 * Gets the ID of the given document
 	 * @param DocName name of the document
-	 * @return the ID of document in the system index.
+	 * @return the ID of document in the system index. If not in the system index, returnn -1. 
 	 */
 	public int getDocumentID(String DocName){
 		//PRE:DocName is Valid and exists in indedx

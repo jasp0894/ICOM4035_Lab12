@@ -64,7 +64,6 @@ public class P3Utils {
 		ArrayList<Entry<Integer,Integer>> l = (ArrayList<Entry<Integer,Integer>>) list;
 		Entry<Integer,Integer> e2 = (Entry<Integer,Integer>) e;
 		Integer docID = e2.getKey();
-		System.out.println(docID);
 		for(int i=0; i<l.size(); i++){
 			
 			if (l.get(i).getKey().equals(docID))
