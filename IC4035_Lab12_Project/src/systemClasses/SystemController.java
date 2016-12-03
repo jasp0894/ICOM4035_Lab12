@@ -239,7 +239,7 @@ public class SystemController {
 		
 		if(docName.equals(""))
 			return "";
-		String info = "\nDocument " + docName + " :\n\tStatus: \n\t--Indexed? ";
+		String info = "\nDocument " + docName + " :\n\tStatus: ";
 
 		File docFilePath; // the path for the document's file
 
@@ -265,7 +265,6 @@ public class SystemController {
 		if(docID>0){
 			
 			//this means the doc has been registered and thus should have an associated idx file. 
-			info+= indexed + "\n\t--Outdated:? ";
 			String fName = makeIDXName(docID);
 			File idxFilePath = new File(P3Utils.IndexDirectoryPath, fName);
 			
@@ -273,14 +272,20 @@ public class SystemController {
 			//was modified vs its associated idx file. 
 			if(idxFilePath.lastModified()<docFilePath.lastModified())
 				modified = true;
-			//not been modified
-			info += modified + "\n";
 		}else{
 			//doc had not been registered.
 			indexed = false;
-			info += indexed + "\n";
+
 		}
 
+		if(!indexed)
+			info += "not added \n";
+		else{
+			if(modified)
+				info += "outdated \n";
+			else
+				info += "up to date \n";
+		}
 		return info;
 
 	}

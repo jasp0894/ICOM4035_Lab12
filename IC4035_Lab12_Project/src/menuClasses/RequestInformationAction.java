@@ -22,24 +22,22 @@ public class RequestInformationAction implements Action {
 			String docName = io.getInput("\nEnter name of document: ").trim(); 
 			String docInfo = "";
 
-			if(docName.equals("*")){
+			if(docName.equals("*")){ //the user wants to view all document's info.
 				int docID = 1;//docIDs start at 1
 				boolean noMoreDocs = false;
+				//go over all documents
 				while(!noMoreDocs){
-				
 					try {
 						String dname = didm.getDocName(docID);
 						docInfo += sc.getDocInformation(dname);
-		
-					} catch (Exception e) {
+					} catch (Exception e) {//reached end of documents list
 						// TODO: handle exception
-						noMoreDocs = true;
+						noMoreDocs = true; 
 					}
-					
 					
 					docID++;
 				}
-			}else
+			}else //info only for document with name docName
 				docInfo = sc.getDocInformation(docName);
 				
 			io.output(docInfo);
