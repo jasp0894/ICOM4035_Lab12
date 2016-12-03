@@ -125,7 +125,6 @@ public class MainIndexManager {
 	throws IllegalArgumentException {
 		ArrayList<Entry<Integer, Integer>> wordDocsList; 
 		wordDocsList = map.get(word); 
-		System.out.println(word);
 		if (wordDocsList == null) 
 			throw new IllegalArgumentException("Word " + word + " is not present in system."); 
 		Entry<Integer, Integer> searchEntry = new AbstractMap.SimpleEntry<>(docID, null); 

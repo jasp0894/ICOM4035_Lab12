@@ -140,10 +140,6 @@ public class SystemController {
 		fillMapFromDocumentText(documentWordsMap, docFile);
 		docFile.close();
 
-		System.out.println("documentWordsMap After been read to be added to the index...S");
-		for(Entry<String, ArrayList<Integer>> e: documentWordsMap.entrySet())
-			System.out.println(e);
-
 		// Registers the document's words in the mim object. For each such
 		// word, it registers pair (docID, f), where docID is the document ID
 		// assigned to the new document, and f = size of list of its locations
@@ -205,41 +201,12 @@ public class SystemController {
 			// where the list of locations contains the integer values of indexes
 			// for the first byte of each occurrence of the word in the document
 			// file.
-			
-			
 			fillMapFromDocumentText(documentWordsMap, raf);
 			raf.close();
 
-			
 			//for each word in the map, invoke the removeDocID method from mim
 			for(Entry<String, ArrayList<Integer>> e: documentWordsMap.entrySet())
-				//mim.removeDocID(e.getKey(), docID);
-				System.out.println(e);
-			
-			
-			/*do {
-				// start with the first word
-				String word = P3Utils.readWord(raf);
-				// read first int after the word(direction of the first
-				// occurrence)
-				int sentinel = raf.readInt();
-
-				while (sentinel != -1) // sentinel marks the end of current word
-										// section inside idx file
-					sentinel = raf.readInt();
-
-				// remove the current doc's word from main index. All entries
-				// whose docID equals raf's docID.
-				mim.removeDocID(word, docID);
-				// this way we are assuring that once we erase the entry in mim,
-				// we will not request it anymore.
-
-			} while (raf.getFilePointer() < (raf.length() - 1)); // there is at
-																	// least one
-																	// more word
-																	// in the
-																	// idx file
-*/
+				mim.removeDocID(e.getKey(), docID);
 					
 		} else
 			throw new IllegalArgumentException("INTERNAL ERROR: An idx file DOES NOT exist for docid = " + docID);
@@ -247,7 +214,7 @@ public class SystemController {
 		// remove document name from docID_index
 		didm.removeDocID(docID);
 
-		return "Document" + docName + "with ID=" + docID + " has been deleted";
+		return "Document " + docName + " with ID=" + docID + " has been deleted";
 	}
 
 	/**
@@ -281,23 +248,32 @@ public class SystemController {
 	private void saveMapToIDXFile(int docID, Map<String, ArrayList<Integer>> documentWordsMap) throws IOException {
 		String fName = makeIDXName(docID);
 		File idxFilePath = new File(P3Utils.IndexDirectoryPath, fName);
-		if (!idxFilePath.exists()) {
-			RandomAccessFile idxFile = new RandomAccessFile(idxFilePath, "rw");
-			for (Entry<String, ArrayList<Integer>> e : documentWordsMap.entrySet()) {
-				String word = e.getKey();
-				P3Utils.writeWordToFile(word, idxFile);
-				for (Integer location : e.getValue())
-					idxFile.writeInt(location);
-				idxFile.writeInt(-1); // marks the end of the list in the file
-			}
+		RandomAccessFile idxFile = new RandomAccessFile(idxFilePath, "rw");
+		
+		//if exists, then the content is overwritten, a new idx file is created otherwise.
+		if(idxFilePath.exists())
+			idxFile.seek(0); //start overwriting from beginning 
+			
+		
+		
+		for (Entry<String, ArrayList<Integer>> e : documentWordsMap.entrySet()) {
+			String word = e.getKey();
+			P3Utils.writeWordToFile(word, idxFile);
+			for (Integer location : e.getValue())
+				idxFile.writeInt(location);
+			idxFile.writeInt(-1); // marks the end of the list in the file
+		}
 
-			idxFile.close();
+		idxFile.close();
+		
+		/*if (!idxFilePath.exists()) {
+			
 		} else
 			throw new IllegalArgumentException("INTERNAL ERROR: An idx file exist for docid = " + docID);
-			//maybe we can or we have to overwrite an existing idx file because when a document its associated
+			//maybe we can or we have to overwrite an existing idx file because when a document is removed its associated
 			//idx file is kept. For example if doc1 has a docID of 1, if after been removed a new document is added, then
 			//it will have the same docID as the removed one, so the above exception will be thrown. 
-	}
+*/	}
 
 	/**
 	 * This method executes and important part of the process of adding a new
@@ -318,8 +294,6 @@ public class SystemController {
 		Document document = new Document(docFile);
 		
 		for (WordInDocument wid : document) {
-			
-			System.out.println(wid.getWord());
 			
 			ArrayList<Integer> wordLocsList = documentWordsMap.get(wid.getWord());
 			// ADD MISSING CODE HERE (Exercise 4)
