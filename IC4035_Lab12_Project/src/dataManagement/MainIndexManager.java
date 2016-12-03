@@ -124,7 +124,8 @@ public class MainIndexManager {
 	public void removeDocID(String word, int docID) 
 	throws IllegalArgumentException {
 		ArrayList<Entry<Integer, Integer>> wordDocsList; 
-		wordDocsList = map.get(word); 		
+		wordDocsList = map.get(word); 
+		System.out.println(word);
 		if (wordDocsList == null) 
 			throw new IllegalArgumentException("Word " + word + " is not present in system."); 
 		Entry<Integer, Integer> searchEntry = new AbstractMap.SimpleEntry<>(docID, null); 
@@ -159,7 +160,9 @@ public class MainIndexManager {
 					
 					//then the Doc ID-frequency pairs
 				
-					for(Map.Entry<Integer,Integer> pairs: e.getValue()){
+					
+					writeToDocsListToFile(e.getValue());
+					/*for(Map.Entry<Integer,Integer> pairs: e.getValue()){
 						//write id and frequency in order.
 						file.writeInt(pairs.getKey());
 						file.writeInt(pairs.getValue());	
@@ -167,7 +170,7 @@ public class MainIndexManager {
 					//write end of sequence for this word
 					file.writeInt(-1);
 					file.writeInt(-1);		
-				}	
+*/				}	
 				file.close(); 
 			} catch (IOException e) { 
 				e.printStackTrace(); 

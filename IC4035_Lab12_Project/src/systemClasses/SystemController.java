@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import javax.print.attribute.standard.DocumentName;
+
 import java.util.Stack;
 
 import menuClasses.MainMenu;
@@ -137,6 +140,10 @@ public class SystemController {
 		fillMapFromDocumentText(documentWordsMap, docFile);
 		docFile.close();
 
+		System.out.println("documentWordsMap After been read to be added to the index...S");
+		for(Entry<String, ArrayList<Integer>> e: documentWordsMap.entrySet())
+			System.out.println(e);
+
 		// Registers the document's words in the mim object. For each such
 		// word, it registers pair (docID, f), where docID is the document ID
 		// assigned to the new document, and f = size of list of its locations
@@ -155,7 +162,6 @@ public class SystemController {
 	}
 
 	public String removeDocumentFromIndex(String docName) throws IOException {
-		
 
 		File docFilePath;
 		// The idea is to verify that the given docName is valid in terms of
@@ -175,46 +181,72 @@ public class SystemController {
 
 		// At this point, we know that the documents exists and its name is
 		// valid.
-		//Now we need to check that it is registered as an indexed document of the system
+		// Now we need to check that it is registered as an indexed document of
+		// the system
 		int docID = didm.getDocumentID(docName);
-		
-		if(docID==-1)
+
+		if (docID == -1)
 			return "Document " + docName + " has not been registered in the system yet";
-		
-		// Now the task is to modify main index and docID index to erase all content related to given document.
-		RandomAccessFile docFile = new RandomAccessFile(docFilePath, "r");
-		
-		//work directly with idx file for this document.
+
+
+		// work directly with idx file for this document.
 		String fName = makeIDXName(docID);
 		File idxFilePath = new File(P3Utils.IndexDirectoryPath, fName);
 
-		if (idxFilePath.exists()) { //if the document is already indexed, then there should be an associated idx file
+		if (idxFilePath.exists()) { // if the document is already indexed, then
+									// there should be an associated idx file
 			// create a RAF to read its content
-			RandomAccessFile raf = new RandomAccessFile(idxFilePath, "r");
+			RandomAccessFile raf = new RandomAccessFile(docFilePath, "r");
 			// iterate over idx file given that we know its format
-			do {
-				//start with the first word
+		
+			Map<String, ArrayList<Integer>> documentWordsMap = new Hashtable<>();
+
+			// Creates the map where entries are pairs (word, list of locations),
+			// where the list of locations contains the integer values of indexes
+			// for the first byte of each occurrence of the word in the document
+			// file.
+			
+			
+			fillMapFromDocumentText(documentWordsMap, raf);
+			raf.close();
+
+			
+			//for each word in the map, invoke the removeDocID method from mim
+			for(Entry<String, ArrayList<Integer>> e: documentWordsMap.entrySet())
+				//mim.removeDocID(e.getKey(), docID);
+				System.out.println(e);
+			
+			
+			/*do {
+				// start with the first word
 				String word = P3Utils.readWord(raf);
-				//read first int after the word(direction of the first occurrence)
+				// read first int after the word(direction of the first
+				// occurrence)
 				int sentinel = raf.readInt();
 
-				while (sentinel != -1) //sentinel marks the end of current word section inside idx file
+				while (sentinel != -1) // sentinel marks the end of current word
+										// section inside idx file
 					sentinel = raf.readInt();
-				
-				//remove the current doc's word from main index. All entries whose docID equals raf's docID.
+
+				// remove the current doc's word from main index. All entries
+				// whose docID equals raf's docID.
 				mim.removeDocID(word, docID);
-				//this way we are assuring that once we erase the entry in mim, we will not request it anymore. 
+				// this way we are assuring that once we erase the entry in mim,
+				// we will not request it anymore.
 
-			} while (raf.getFilePointer()<(raf.length()-1)); //there is at least one more word in the idx file
-
+			} while (raf.getFilePointer() < (raf.length() - 1)); // there is at
+																	// least one
+																	// more word
+																	// in the
+																	// idx file
+*/
+					
 		} else
 			throw new IllegalArgumentException("INTERNAL ERROR: An idx file DOES NOT exist for docid = " + docID);
 
 		// remove document name from docID_index
-
 		didm.removeDocID(docID);
 
-		
 		return "Document" + docName + "with ID=" + docID + " has been deleted";
 	}
 
@@ -262,6 +294,9 @@ public class SystemController {
 			idxFile.close();
 		} else
 			throw new IllegalArgumentException("INTERNAL ERROR: An idx file exist for docid = " + docID);
+			//maybe we can or we have to overwrite an existing idx file because when a document its associated
+			//idx file is kept. For example if doc1 has a docID of 1, if after been removed a new document is added, then
+			//it will have the same docID as the removed one, so the above exception will be thrown. 
 	}
 
 	/**
@@ -281,24 +316,23 @@ public class SystemController {
 	 */
 	private void fillMapFromDocumentText(Map<String, ArrayList<Integer>> documentWordsMap, RandomAccessFile docFile) {
 		Document document = new Document(docFile);
+		
 		for (WordInDocument wid : document) {
+			
+			System.out.println(wid.getWord());
+			
 			ArrayList<Integer> wordLocsList = documentWordsMap.get(wid.getWord());
 			// ADD MISSING CODE HERE (Exercise 4)
 
-			if (wordLocsList == null) { // current wordindocument is not in the
-										// map yet.
-
+			if (wordLocsList == null) // current wordindocument is not in the map yet.
 				wordLocsList = new ArrayList<>();
-				wordLocsList.add((int) wid.getLocation());
-
-				documentWordsMap.put(wid.getWord(), wordLocsList);
-			} else {
-				// current wordindocument was found. add a new location to the
-				// list of locations
-				wordLocsList.add((int) wid.getLocation());
-				// edit the map
-				documentWordsMap.put(wid.getWord(), wordLocsList);
-			}
+			
+			
+			// current wordindocument was found. add a new location to the
+			// list of locations
+			wordLocsList.add((int) wid.getLocation());
+			// edit the map
+			documentWordsMap.put(wid.getWord(), wordLocsList);
 		}
 	}
 
