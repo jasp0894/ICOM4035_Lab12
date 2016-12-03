@@ -3,6 +3,7 @@ package systemClasses;
 import generalClasses.P3Utils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Array;
@@ -157,6 +158,16 @@ public class SystemController {
 																	// fine
 	}
 
+	/**
+	 * This method removes a document from the index (main index and docID). No
+	 * other actions are taken.
+	 * 
+	 * @param docName
+	 *            document to be removed
+	 * @return A message stating the successfulness of the operation.
+	 * @throws IOException
+	 *             if an I/O error occurs.
+	 */
 	public String removeDocumentFromIndex(String docName) throws IOException {
 
 		File docFilePath;
@@ -165,12 +176,8 @@ public class SystemController {
 		// that is indeed an existent document.
 
 		try {
-			docFilePath = P3Utils.validateDocumentFile(docName); // validates
-																	// docName
-																	// in terms
-																	// of the
-																	// criteria
-			// mentioned above
+			docFilePath = P3Utils.validateDocumentFile(docName); 
+			// validates docName in terms of the criteria mentioned above
 		} catch (IllegalArgumentException e) {
 			return e.getMessage();
 		}
@@ -184,7 +191,6 @@ public class SystemController {
 		if (docID == -1)
 			return "Document " + docName + " has not been registered in the system yet";
 
-
 		// work directly with idx file for this document.
 		String fName = makeIDXName(docID);
 		File idxFilePath = new File(P3Utils.IndexDirectoryPath, fName);
@@ -194,20 +200,22 @@ public class SystemController {
 			// create a RAF to read its content
 			RandomAccessFile raf = new RandomAccessFile(docFilePath, "r");
 			// iterate over idx file given that we know its format
-		
+
 			Map<String, ArrayList<Integer>> documentWordsMap = new Hashtable<>();
 
-			// Creates the map where entries are pairs (word, list of locations),
-			// where the list of locations contains the integer values of indexes
+			// Creates the map where entries are pairs (word, list of
+			// locations),
+			// where the list of locations contains the integer values of
+			// indexes
 			// for the first byte of each occurrence of the word in the document
 			// file.
 			fillMapFromDocumentText(documentWordsMap, raf);
 			raf.close();
 
-			//for each word in the map, invoke the removeDocID method from mim
-			for(Entry<String, ArrayList<Integer>> e: documentWordsMap.entrySet())
+			// for each word in the map, invoke the removeDocID method from mim
+			for (Entry<String, ArrayList<Integer>> e : documentWordsMap.entrySet())
 				mim.removeDocID(e.getKey(), docID);
-					
+
 		} else
 			throw new IllegalArgumentException("INTERNAL ERROR: An idx file DOES NOT exist for docid = " + docID);
 
@@ -215,6 +223,66 @@ public class SystemController {
 		didm.removeDocID(docID);
 
 		return "Document " + docName + " with ID=" + docID + " has been deleted";
+	}
+
+	/**
+	 * To be used whenever relevant document information need to be displayed.
+	 * These information is related to the status of the document (i.e., if the
+	 * document has been modified or not)
+	 * 
+	 * @param docName
+	 *            name of the document in question.
+	 * @return the relevant information.
+	 */
+	public String getDocInformation(String docName) {
+		
+		
+		if(docName.equals(""))
+			return "";
+		String info = "\nDocument " + docName + " :\n\tStatus: \n\t--Indexed? ";
+
+		File docFilePath; // the path for the document's file
+
+		// Call method in P3Utils to validate the name and file. It the file
+		// name
+		// is not valid or the corresponding file does not exist in the docs
+		// directory, it then terminates returning the message of an exception
+		// with an IllegalArgumentException; in that case, it the addNewDocument
+		// execution ends returning the message inside the exception object.
+		try {
+			docFilePath = P3Utils.validateDocumentFile(docName);
+		} catch (IllegalArgumentException e) {
+			return e.getMessage();
+		}
+
+		// At this point, we know that the documents exists and its name is
+		// valid.
+		// Now we need to check that it is registered as an indexed document of
+		// the system
+		int docID = didm.getDocumentID(docName);
+		//verify if the document has been modified
+		boolean modified = false, indexed = true;
+		if(docID>0){
+			
+			//this means the doc has been registered and thus should have an associated idx file. 
+			info+= indexed + "\n\t--Outdated:? ";
+			String fName = makeIDXName(docID);
+			File idxFilePath = new File(P3Utils.IndexDirectoryPath, fName);
+			
+			//determine if it has been modified by comparing the last time doc file 
+			//was modified vs its associated idx file. 
+			if(idxFilePath.lastModified()<docFilePath.lastModified())
+				modified = true;
+			//not been modified
+			info += modified + "\n";
+		}else{
+			//doc had not been registered.
+			indexed = false;
+			info += indexed + "\n";
+		}
+
+		return info;
+
 	}
 
 	/**
@@ -249,13 +317,12 @@ public class SystemController {
 		String fName = makeIDXName(docID);
 		File idxFilePath = new File(P3Utils.IndexDirectoryPath, fName);
 		RandomAccessFile idxFile = new RandomAccessFile(idxFilePath, "rw");
-		
-		//if exists, then the content is overwritten, a new idx file is created otherwise.
-		if(idxFilePath.exists())
-			idxFile.seek(0); //start overwriting from beginning 
-			
-		
-		
+
+		// if exists, then the content is overwritten, a new idx file is created
+		// otherwise.
+		if (idxFilePath.exists())
+			idxFile.seek(0); // start overwriting from beginning
+
 		for (Entry<String, ArrayList<Integer>> e : documentWordsMap.entrySet()) {
 			String word = e.getKey();
 			P3Utils.writeWordToFile(word, idxFile);
@@ -265,15 +332,18 @@ public class SystemController {
 		}
 
 		idxFile.close();
-		
-		/*if (!idxFilePath.exists()) {
-			
-		} else
-			throw new IllegalArgumentException("INTERNAL ERROR: An idx file exist for docid = " + docID);
-			//maybe we can or we have to overwrite an existing idx file because when a document is removed its associated
-			//idx file is kept. For example if doc1 has a docID of 1, if after been removed a new document is added, then
-			//it will have the same docID as the removed one, so the above exception will be thrown. 
-*/	}
+
+		/*
+		 * if (!idxFilePath.exists()) {
+		 * 
+		 * } else throw new IllegalArgumentException(
+		 * "INTERNAL ERROR: An idx file exist for docid = " + docID); //maybe we
+		 * can or we have to overwrite an existing idx file because when a
+		 * document is removed its associated //idx file is kept. For example if
+		 * doc1 has a docID of 1, if after been removed a new document is added,
+		 * then //it will have the same docID as the removed one, so the above
+		 * exception will be thrown.
+		 */ }
 
 	/**
 	 * This method executes and important part of the process of adding a new
@@ -292,16 +362,16 @@ public class SystemController {
 	 */
 	private void fillMapFromDocumentText(Map<String, ArrayList<Integer>> documentWordsMap, RandomAccessFile docFile) {
 		Document document = new Document(docFile);
-		
+
 		for (WordInDocument wid : document) {
-			
+
 			ArrayList<Integer> wordLocsList = documentWordsMap.get(wid.getWord());
 			// ADD MISSING CODE HERE (Exercise 4)
 
-			if (wordLocsList == null) // current wordindocument is not in the map yet.
+			if (wordLocsList == null) // current wordindocument is not in the
+										// map yet.
 				wordLocsList = new ArrayList<>();
-			
-			
+
 			// current wordindocument was found. add a new location to the
 			// list of locations
 			wordLocsList.add((int) wid.getLocation());
@@ -337,16 +407,8 @@ public class SystemController {
 		// words in the search
 		// list that it contains. All words as treated as in lower case
 		for (String word : wtSearchList) {
-			Iterable<Entry<Integer, Integer>> docAndWFEntry = mim.getDocsList(word.toLowerCase()); // pairs
-																									// (d,
-																									// f)
-																									// --
-																									// one
-																									// for
-																									// each
-																									// doc
-																									// containing
-																									// word
+			Iterable<Entry<Integer, Integer>> docAndWFEntry = mim.getDocsList(word.toLowerCase());
+			// pairs (d,f) --  one for each doc containingword
 			if (docAndWFEntry != null)
 				for (Entry<Integer, Integer> docFreqPair : docAndWFEntry)
 					addToMatchingDocumentsMap(matchingDocuments, docFreqPair.getKey(), word.toLowerCase());

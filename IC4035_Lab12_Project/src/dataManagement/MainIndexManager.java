@@ -28,7 +28,8 @@ public class MainIndexManager {
 	private MainIndexManager() throws IOException { 
 		modified = false; 
 		map = new Hashtable<>(); 
-		String fName = "main_index.pp3"; 
+		String fName = ""
+				+ "main_index.pp3"; 
 		fPath = new File(P3Utils.IndexDirectoryPath, fName); 
 		if (fPath.exists()) {//in case an exception wasn't thrown due to inexistent path
 			file = new RandomAccessFile(fPath, "r"); 

@@ -5,6 +5,12 @@ import java.io.IOException;
 import ioManagementClasses.IOComponent;
 import systemClasses.SystemController;
 
+
+/**
+ * \The action to remove a document from the index. 
+ * @author J.A. Sanchez Perez
+ *
+ */
 public class RemoveDocumentAction implements Action {
 
 	@Override
