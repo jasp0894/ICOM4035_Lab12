@@ -237,7 +237,7 @@ public class SystemController {
 	public String getDocInformation(String docName) {
 		
 		
-		if(docName.equals(""))
+		if(docName.equals("")) //doc was removed from index
 			return "";
 		String info = "\nDocument " + docName + " :\n\tStatus: ";
 
@@ -278,6 +278,7 @@ public class SystemController {
 
 		}
 
+		//determine the status
 		if(!indexed)
 			info += "not added \n";
 		else{
@@ -286,6 +287,8 @@ public class SystemController {
 			else
 				info += "up to date \n";
 		}
+		
+		
 		return info;
 
 	}
@@ -446,6 +449,7 @@ public class SystemController {
 	 */
 	private void addToMatchingDocumentsMap(Map<Integer, MatchingSearchDocument> mdm, int docID, String word)
 			throws IllegalArgumentException, IOException {
+		
 		MatchingSearchDocument docMD = mdm.get(docID);
 		if (docMD == null) {
 			docMD = new MatchingSearchDocument(docID);

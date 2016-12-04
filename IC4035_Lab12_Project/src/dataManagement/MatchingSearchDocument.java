@@ -20,7 +20,7 @@ public class MatchingSearchDocument {
 	// that are part of the document
 	private ArrayList<String> matchingWords;       // words
 	private ArrayList<Long> matchingLocations;  // locations in document
-	
+	private float rank; 
 	public MatchingSearchDocument(int docID) throws IllegalArgumentException, IOException { 
 		docIDX = new DocumentIDX(docID);        // instantiates object with data from IDX file
 		matchingWords = new ArrayList<>(); 
@@ -67,6 +67,18 @@ public class MatchingSearchDocument {
 		return result; 
 	}
 	
+	public ArrayList<String> getMatchingWords(){
+		return matchingWords;
+	}
+	
+	public int getMatchingWordOccurrences(String word){
+		return ((ArrayList<Integer>)docIDX.getWordLocations(word)).size();
+	}
+	
+	public int getOriginalDocLenght(){
+		return docIDX.numberOfRegisteredWords();
+	}
+	
 	/**
 	 * Displays a specific number of lines from the specified document. 
 	 * If the number of lines is given as 0, then que whole document is
@@ -79,5 +91,15 @@ public class MatchingSearchDocument {
 			document = new Document(docIDX.getDocID()); 
 		document.displayDocumentContent(matchingLocations, nLines);
 	}
+	
+	
+	public void setRank(float rank){
+		this.rank = rank;
+	}
+	
+	public float getRank(){
+		return this.rank;
+	}
+
 
 }

@@ -6,6 +6,8 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 
+import dataManagement.MatchingSearchDocument;
+
 public class P3Utils {
 	public static final int MAXFILENAMELENGTH = 20; 
 	public static final File IndexDirectoryPath = new File("p340354020data", "index"); 
@@ -97,5 +99,23 @@ public class P3Utils {
 		return word; 
 	}
 
+	public static float computeRank(MatchingSearchDocument msd, int listSize){
+	
+		float r = msd.getMathingWordsLocations().size();
+		float n= listSize;
+		
+		float pd = r/n;
+		
+		float rd = 0;
+		
+		for (String word : msd.getMatchingWords()) 
+			//divide the result by the total number of words in original doc
+			rd += (r*(float)msd.getMatchingWordOccurrences(word))/((float)msd.getOriginalDocLenght());
+			
+		float rank = pd+rd;
+		msd.setRank(rank);
+		
+		return rank;
+	}
 
 }
