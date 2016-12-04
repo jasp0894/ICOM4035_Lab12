@@ -101,16 +101,18 @@ public class P3Utils {
 
 	public static float computeRank(MatchingSearchDocument msd, int listSize){
 	
-		float r = msd.getMathingWordsLocations().size();
+		float r = msd.getMatchingWords().size();
 		float n= listSize;
-		
+		System.out.println("r= "+r + "\tn= "+n );
 		float pd = r/n;
-		
+		System.out.println("pd= "+pd);
 		float rd = 0;
 		
 		for (String word : msd.getMatchingWords()) 
 			//divide the result by the total number of words in original doc
 			rd += (r*(float)msd.getMatchingWordOccurrences(word))/((float)msd.getOriginalDocLenght());
+		
+		System.out.println("rd= "+rd);
 			
 		float rank = pd+rd;
 		msd.setRank(rank);

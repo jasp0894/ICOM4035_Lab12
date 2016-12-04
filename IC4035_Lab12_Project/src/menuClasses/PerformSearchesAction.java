@@ -102,7 +102,9 @@ public class PerformSearchesAction implements Action {
 		//go through all (docID,msd) entries in matchingDocuments. 
 		for (Entry<Integer, MatchingSearchDocument> e : matchingDocuments.entrySet()) {
 			//compute the rank for this document
-			P3Utils.computeRank(e.getValue(), searchListSize);
+			float rank =P3Utils.computeRank(e.getValue(), searchListSize);
+			
+			System.out.println("DocID="+e.getKey()+ " rank: " + rank);
 			rankedDocuments.add(e.getValue()); // just add them for now. 
 		}
 		
