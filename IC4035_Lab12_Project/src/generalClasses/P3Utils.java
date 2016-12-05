@@ -67,7 +67,6 @@ public class P3Utils {
 		Entry<Integer,Integer> e2 = (Entry<Integer,Integer>) e;
 		Integer docID = e2.getKey();
 		for(int i=0; i<l.size(); i++){
-			
 			if (l.get(i).getKey().equals(docID))
 				return i; 
 		}
@@ -99,21 +98,24 @@ public class P3Utils {
 		return word; 
 	}
 
+	/**
+	 * To compute the rank of the given matching search document. The idea is to rank the document, such that it
+	 * can be compared to other documents' ranks
+	 * @param msd document.
+	 * @param listSize size of the list of words to search entered by the user. 
+	 * @return The rank of the document. It is a number [0:2]
+	 */
 	public static float computeRank(MatchingSearchDocument msd, int listSize){
 	
 		float r = msd.getMatchingWords().size();
 		float n= listSize;
-		System.out.println("r= "+r + "\tn= "+n );
 		float pd = r/n;
-		System.out.println("pd= "+pd);
 		float rd = 0;
 		
 		for (String word : msd.getMatchingWords()) 
 			//divide the result by the total number of words in original doc
 			rd += (r*(float)msd.getMatchingWordOccurrences(word))/((float)msd.getOriginalDocLenght());
-		
-		System.out.println("rd= "+rd);
-			
+					
 		float rank = pd+rd;
 		msd.setRank(rank);
 		
