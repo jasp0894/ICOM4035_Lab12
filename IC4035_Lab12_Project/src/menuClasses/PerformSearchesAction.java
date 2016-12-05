@@ -104,19 +104,24 @@ public class PerformSearchesAction implements Action {
 			//compute the rank for this document
 			float rank =P3Utils.computeRank(e.getValue(), searchListSize);
 			
-			System.out.println("DocID="+e.getKey()+ " rank: " + rank);
+			//System.out.println("DocID="+e.getKey()+ " rank: " + rank);
 			rankedDocuments.add(e.getValue()); // just add them for now. 
 		}
 		
+		for(MatchingSearchDocument msd: rankedDocuments)
+			System.out.println(msd.getRank());
 		//now we want to sort the content by rank
 		Collections.sort(rankedDocuments, new Comparator<MatchingSearchDocument>() {
 
 			@Override
 			public int compare(MatchingSearchDocument arg0, MatchingSearchDocument arg1) {
 				// TODO Auto-generated method stub
-				return  (int) ((int)arg0.getRank() - arg1.getRank());
+				return  Float.floatToIntBits(arg1.getRank() - arg0.getRank());
 			}
 		});
+		
+		for(MatchingSearchDocument msd: rankedDocuments)
+				System.out.println(msd.getRank());
 		return rankedDocuments; 
 	}
 

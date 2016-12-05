@@ -277,7 +277,7 @@ public class SystemController {
 			indexed = false;
 
 		}
-
+	
 		//determine the status
 		if(!indexed)
 			info += "not added \n";
@@ -329,7 +329,7 @@ public class SystemController {
 		// if exists, then the content is overwritten, a new idx file is created
 		// otherwise.
 		if (idxFilePath.exists())
-			idxFile.seek(0); // start overwriting from beginning
+			idxFile.setLength(0); // start overwriting from beginning
 
 		for (Entry<String, ArrayList<Integer>> e : documentWordsMap.entrySet()) {
 			String word = e.getKey();
